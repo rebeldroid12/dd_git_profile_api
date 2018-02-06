@@ -1,9 +1,19 @@
 import requests
 import os
+from flask_restful import Resource
 
-from pprint import pprint
 
+# authenticate for more pings
 AUTH = (os.getenv('GITHUB_USER'), os.getenv('GITHUB_PASSWORD'))
+
+
+class GithubAPI(Resource):
+    def get(self, user):
+        result = {
+            'data': get_github_stats('{}'.format(user))
+        }
+
+        return result
 
 
 def get_github_data(path):
@@ -194,16 +204,23 @@ def get_repo_info(repo):
     else:
         forked = "original"
 
+    # get language
+    if repo['language']:
+        language = repo['language']
+    else:
+        language = 'Not Specified'
+
     result = {
         "full_name": repo['full_name'],
-        "language": repo['language'],
+        "language": language,
         "pub_repo_type": forked,
         "forks_cnt": repo['forks_count'],
         "watchers_cnt": repo['watchers_count'],
         "open_issues_cnt": repo['open_issues_count'],
         "star_cnt": repo['stargazers_count'],
         "api_url": repo['url'],
-        "url": repo['html_url']
+        "url": repo['html_url'],
+        "size": repo['size']
     }
 
     return result
@@ -229,7 +246,7 @@ def cleaned_repos_data(repos):
 def get_repo_summary(repos, item, action, repo_type=None):
     """
     Given a list of json repos takes in list of dicts and either sums up or counts
-    :param repos:
+    :param repos: list of repos
     :param item:
     :param action: count, sum or list
     :param repo_type: original or forked
@@ -292,6 +309,7 @@ def get_github_stats(user):
     # user profile
     profile_data = page_thru_github_data_json('users/{}'.format(user))
 
+
     # construct repo topics url
     get_list_of_topics = ['repos/{}/topics'.format(user_repo)
                           for user_repo in get_repo_summary(repos=all_repos, item='full_name', action='list')]
@@ -318,7 +336,7 @@ def get_github_stats(user):
 
     result = {
         # login
-        "github_user": profile_data['login'],
+        "user": profile_data['login'],
 
         # total follower count
         "followers": profile_data['followers'],
@@ -329,6 +347,9 @@ def get_github_stats(user):
         # total number of stars given
         "total_stars_given": starred,
 
+        # total number of stars received
+        "total_stars_received": get_repo_summary(repos=all_repos, item='star_cnt', action='sum'),
+
         # list/count of repo topics
         "repo_topics": list_count_repo_topics,
 
@@ -336,32 +357,22 @@ def get_github_stats(user):
         "languages": get_repo_summary(repos=all_repos, item='language', action='count'),
 
         # total number of public repos (original vs forked)
-        "repo_type": get_repo_summary(repos=all_repos, item='pub_repo_type', action='count'),
+        "repos": get_repo_summary(repos=all_repos, item='pub_repo_type', action='count'),
 
         # total watchers count
         "total_watchers": get_repo_summary(repos=all_repos, item='watchers_cnt', action='sum'),
 
-        # total number of stars received
-        "total_stars_received":  get_repo_summary(repos=all_repos, item='star_cnt', action='sum'),
-
         # total number of open issues
         "total_open_issues":  get_repo_summary(repos=all_repos, item='open_issues_cnt', action='sum'),
-
-        # total number of forks made
-        "total_times_forked":  get_repo_summary(repos=all_repos, item='forks_cnt', action='sum'),
 
         # total number of commits to their repos (not forks)
         "total_commits": sum(repo_commits),
 
         # total size of their accounts
-        "total_account_size": 0     # TODO... ASK
+        "total_account_size": get_repo_summary(repos=all_repos, item='size', action='sum')
     }
 
     return result
 
 
-# total size of their accounts - to do
 
-pprint(get_github_stats('rebeldroid12'))
-
-#pprint(get_github_stats('kennethreitz'))
