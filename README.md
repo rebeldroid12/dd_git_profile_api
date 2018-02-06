@@ -18,10 +18,11 @@ Develop API that aggregates data from both Github and BitBucket API to present i
 - list/count of repo topics
 
 ## How to run
-1. Add GITHUB_USER and GITHUB_PASSWORD to your environment variables
+1. Add GITHUB_USER and GITHUB_PASSWORD to your environment variables with your github credentials (works if not two-auth)
 2. Clone repo: https://github.com/rebeldroid12/dd_git_profile_api/
 3. Create a virtualenv and run `pip install -r requirements.txt`
 4. Run `python my_api.py`
+5. You'll be running on ['http://127.0.0.1:5002']('http://127.0.0.1:5002')
 
 
 ### To get summary stats on a specific Github & Bitbucket user:
@@ -44,3 +45,18 @@ GET /stats/bitbucket/<bitbucket_user>
 ex: [http://127.0.0.1:5002/stats/bitbucket/rebeldroid12](http://127.0.0.1:5002/stats/bitbucket/rebeldroid12)
 ![Bitbucket stats only](https://github.com/rebeldroid12/dd_git_profile_api/blob/master/misc/bitbucket.png)
 
+### Error messages
+If user cannot be found on Github but can be found on Bitbucket:
+![No merge due to Github user](https://github.com/rebeldroid12/dd_git_profile_api/blob/master/misc/no_merge_on_github.png)
+
+If user cannot be found on Bitbucket but can be found on Github:
+![No merge due to Bitbucket user](https://github.com/rebeldroid12/dd_git_profile_api/blob/master/misc/no_merge_on_bitbucket.png)
+
+If user cannot be found on either Github or Bitbucket:
+![No merge due to both](https://github.com/rebeldroid12/dd_git_profile_api/blob/master/misc/no_merge_on_both.png)
+
+If user cannot be found on Github:
+![Bad github](https://github.com/rebeldroid12/dd_git_profile_api/blob/master/misc/bad_github.png)
+
+If user cannot be found on Bitbucket:
+![Bad bitbucket](https://github.com/rebeldroid12/dd_git_profile_api/blob/master/misc/bad_bitbucket.png)
