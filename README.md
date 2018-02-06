@@ -53,7 +53,7 @@ If user cannot be found on Bitbucket but can be found on Github:
 ![No merge due to Bitbucket user](https://github.com/rebeldroid12/dd_git_profile_api/blob/master/misc/no_merge_on_bitbucket.png)
 
 If user cannot be found on either Github or Bitbucket:
-![No merge due to both](https://github.com/rebeldroid12/dd_git_profile_api/blob/master/misc/no_merge_on_both.png)
+![No merge due to both](https://github.com/rebeldroid12/dd_git_profile_api/blob/master/misc/no_merge_both.png)
 
 If user cannot be found on Github:
 ![Bad github](https://github.com/rebeldroid12/dd_git_profile_api/blob/master/misc/bad_github.png)
