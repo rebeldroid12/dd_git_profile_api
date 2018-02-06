@@ -10,7 +10,7 @@ AUTH = (os.getenv('GITHUB_USER'), os.getenv('GITHUB_PASSWORD'))
 class GithubAPI(Resource):
     def get(self, user):
         result = {
-            'data': get_github_stats('{}'.format(user))
+            'data': get_github_stats(user)
         }
 
         return result

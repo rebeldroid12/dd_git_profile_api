@@ -7,7 +7,7 @@ from flask_restful import Resource
 class BitbucketAPI(Resource):
     def get(self, user):
         result = {
-            'data': get_bitbucket_stats('{}'.format(user))
+            'data': get_bitbucket_stats(user)
         }
 
         return result
