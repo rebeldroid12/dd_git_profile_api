@@ -17,13 +17,30 @@ Develop API that aggregates data from both Github and BitBucket API to present i
 - list/count of languages used
 - list/count of repo topics
 
-## Considerations
-- how to handle failed network call to github/bitbucket (what to return to client)
-- which REST verbs and URI structure makes the most sense
-- how efficient is your code?
+## How to run
+1. Add GITHUB_USER and GITHUB_PASSWORD to your environment variables
+2. Clone repo: https://github.com/rebeldroid12/dd_git_profile_api/
+3. Create a virtualenv and run `pip install -r requirements.txt`
+4. Run `python my_api.py`
 
-## Rules of Engagement
-- python 3.6 & Flask
-- documentation
-- readme
-- unit tests
+
+### To get summary stats on a specific Github & Bitbucket user:
+GET /stats/github/<github_user>/bitbucket/<bitbucket_user>
+
+ex: [http://127.0.0.1:5002/stats/github/rebeldroid12/bitbucket/rebeldroid12](http://127.0.0.1:5002/stats/github/rebeldroid12/bitbucket/rebeldroid12)
+![Aggregated stats](https://github.com/rebeldroid12/dd_git_profile_api/blob/master/misc/merged.png)
+
+
+### To get summary stats on a specific Github user:
+GET /stats/github/<github_user>
+
+ex: [http://127.0.0.1:5002/stats/github/rebeldroid12](http://127.0.0.1:5002/stats/github/rebeldroid12)
+![Github stats only](https://github.com/rebeldroid12/dd_git_profile_api/blob/master/misc/github.png)
+
+
+### To get summary stats on a specific Bitbucket user:
+GET /stats/bitbucket/<bitbucket_user>
+
+ex: [http://127.0.0.1:5002/stats/bitbucket/rebeldroid12](http://127.0.0.1:5002/stats/bitbucket/rebeldroid12)
+![Bitbucket stats only](https://github.com/rebeldroid12/dd_git_profile_api/blob/master/misc/bitbucket.png)
+

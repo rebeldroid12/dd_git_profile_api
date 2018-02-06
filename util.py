@@ -89,7 +89,7 @@ def get_specific_count_to_sum(list_of_json, key_of_interest):
     return sum(to_sum)
 
 
-def merge_git_accounts(github_data, bitbucket_data):
+def aggregate_git_accounts(github_data, bitbucket_data):
     """
     Merge/aggregate github_data and bitbucket_data
     :param github_data:

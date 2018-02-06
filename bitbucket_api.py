@@ -1,13 +1,17 @@
 import requests
 import os
-
 from flask_restful import Resource
 
 from util import flatten_list, count_items_in_list, get_specific_count_to_sum
 
 
-class BitbucketAPI(Resource):
+class BitbucketAPI(Resource):       # used to hit bitbucket stats endpoint
     def get(self, bb_user):
+        """
+        Given the bitbucket user pull all the bitbucket stats
+        :param bb_user: bitbucket user
+        :return: stats
+        """
         result = {
             'data': get_bitbucket_stats(bb_user)
         }
@@ -17,11 +21,12 @@ class BitbucketAPI(Resource):
 
 def get_bitbucket_data(path):
     """
-    Given path extract the endpoint, return data
-    :param path:
-    :return: result - request, endpoint
+    Given path extract the endpoint data, return json data
+    :param path: endpoint
+    :return: json data
     """
 
+    # base bitbucket url
     bitbucket_api = "https://api.bitbucket.org/2.0/"
 
     # construct url
@@ -32,8 +37,10 @@ def get_bitbucket_data(path):
     else:
         url = path
 
+    # request
     r = requests.get(url)
 
+    # check it's good to go if so return the json data
     if r.status_code == 200:
         result = {"result": r.json()}
     else:
@@ -44,11 +51,12 @@ def get_bitbucket_data(path):
 
 def page_thru_bitbucket_data_json(path):
     """
-    Parse thru all bitbucket data
-    :param path:
-    :return:
+    Parse through all bitbucket data, grab all data from all pages
+    :param path: endpoint
+    :return: all data for given endpoint
     """
 
+    # grab all the data
     all_data = []
 
     # first time call
@@ -56,13 +64,13 @@ def page_thru_bitbucket_data_json(path):
 
     # next only appears if there is a next page
     while 'next' in data.keys():
-        all_data.append(data['values'])
-        data = get_bitbucket_data(data['next'])['result']
+        all_data.append(data['values'])     # get just the values node (all data we care about is in there)
+        data = get_bitbucket_data(data['next'])['result']   # get the data from the next page
 
-    # grab data
+    # grab data - in cases where there is no next ex: first item with no next, last time with no next
     all_data.append(data['values'])
 
-    # flatten if necessary (list of lists of dicts)
+    # flatten if necessary (list of lists of dicts) - in case where there was a next
     if len(all_data) > 1:
         r = flatten_list(all_data)
 
@@ -76,10 +84,11 @@ def page_thru_bitbucket_data_json(path):
 
 def get_bitbucket_stats(user):
     """
-    Get users info
-    :param user:
-    :return:
+    Given a user (or team), grab all desired stats
+    :param user: bitbucket user or team
+    :return: aggregated bitbucket stats
     """
+
     # users endpoint
     user_data = get_bitbucket_data('users/{}'.format(user))
 
@@ -89,90 +98,106 @@ def get_bitbucket_stats(user):
 
     # could not get from users or teams
     if not user_data:
-        raise ValueError("Given user is not of type 'teams' or type 'user, please check again")
+        # raise ValueError("Given user is not of type 'teams' or type 'user, please check again")
 
-    # get results of data
-    data = user_data['result']
+        result = {"message": "Given user is not of type 'teams' or type 'user, please check user is a valid bitbucket user."}
 
-    user_data_links = data['links']
+    else:
+        # get results of data
+        data = user_data['result']
 
-    parse_thru_repos = page_thru_bitbucket_data_json(user_data_links['repositories']['href'])['result']
+        # links holds all the endpoints/links we will need to go through
+        user_data_links = data['links']
 
-    commits = []
-    watchers = []
-    size = []
-    language = []
-    issues = []
-    repo_types = []
+        # go through all of the repos for the user
+        parse_thru_repos = page_thru_bitbucket_data_json(user_data_links['repositories']['href'])['result']
 
-    for repo in parse_thru_repos:
+        commits = []
+        watchers = []
+        size = []
+        language = []
+        issues = []
+        repo_types = []
 
-        # differentiate between original & forked repos
-        if 'parent' not in repo.keys():     # parent only appears in forked repos
-            repo_type = 'original'
+        for repo in parse_thru_repos:
 
-            # get commits per repo - only for original
-            commits += get_bitbucket_data(repo['links']['commits']['href'])['result']['values']
+            # differentiate between original & forked repos
+            if 'parent' not in repo.keys():     # parent only appears in forked repos
+                repo_type = 'original'
 
-        else:
-            repo_type = 'forked'
+                # get commits per repo - only for original
+                commits += get_bitbucket_data(repo['links']['commits']['href'])['result']['values']
 
-        repo_types.append(repo_type)
+            else:
+                repo_type = 'forked'
 
-        # get sizes of repo
-        size.append(repo['size'])
+            # add repo types to list - counted later
+            repo_types.append(repo_type)
 
-        # get languages
-        if 'language' in repo.keys():
-            if repo['language'] == '':
-                repo['language'] = 'Not Specified'
+            # get sizes of repo - add repo size to list
+            size.append(repo['size'])
 
-            language.append(repo['language'])
+            # get languages - add language to list
+            if 'language' in repo.keys():
+                if repo['language'] == '':
+                    repo['language'] = 'Not Specified'
 
-        # get watchers per repo
-        watchers.append(get_bitbucket_data(repo['links']['watchers']['href'])['result']['size'])
+                language.append(repo['language'])
 
-        # get all issues - if it has
-        if 'issues' in repo['links'] and get_bitbucket_data(repo['links']['issues']['href']):
-            all_issues = get_bitbucket_data(repo['links']['issues']['href'])['result']['values']
+            # get watchers per repo - add watchers to list
+            watchers.append(get_bitbucket_data(repo['links']['watchers']['href'])['result']['size'])
 
-            # create list/count of issues
-            issues.append(count_items_in_list(all_issues, 'state'))
+            # get all issues - if it has (not all repos have issues)
+            if 'issues' in repo['links']:
 
-    result = {
+                # hit issues endpoint
+                issues_link = get_bitbucket_data(repo['links']['issues']['href'])
 
-        #login
-        "user" : data['username'],
+                # if data in issues endpoint then grab the values
+                if issues_link:
+                    all_issues = issues_link['result']['values']
 
-        # total follower count
-        "followers": get_bitbucket_data(user_data_links['followers']['href'])['result']['size'],
+                # create list/count of issues
+                issues.append(count_items_in_list(all_issues, 'state'))
 
-        # total following count
-        "following": get_bitbucket_data(user_data_links['following']['href'])['result']['size'],
+        # get followers info
+        followers = get_bitbucket_data(user_data_links['followers']['href'])
 
-        # # total number of stars given
-        # "total_stars_given": 0,  # NA
-        #
-        # # total number of stars received
-        # "total_stars_received": 0,  # NA
+        # get following info
+        following = get_bitbucket_data(user_data_links['following']['href'])
 
-        # list/count of repo topics
+        result = {
 
-        # list/count of languages used
-        "languages": count_items_in_list(language),
+            # user/team
+            "user": data['username'],
 
-        # total number of public repos (original vs forked)
-        "repos": count_items_in_list(repo_types),
+            # total follower count
+            "followers": followers['result']['size'],
 
-        # total number of open issues
-        "total_open_issues": get_specific_count_to_sum(issues, 'new'),
+            # total following count
+            "following": following['result']['size'],
 
-        # total number of commits to their repos (not forks)
-        "total_commits": len(commits),
+            # total number of stars given - NA
 
-        # total size of their account
-        "total_account_size": sum(size)
+            # total number of stars received - NA
 
-    }
+            # list/count of repo topics - NA
+
+            # list/count of languages used
+            "languages": count_items_in_list(language),
+
+            # total number of public repos (original vs forked)
+            "repos": count_items_in_list(repo_types),
+
+            # total number of open issues
+            "total_open_issues": get_specific_count_to_sum(issues, 'new'),
+
+            # total number of commits to their repos (not forks)
+            "total_commits": len(commits),
+
+            # total size of their account
+            "total_account_size": sum(size)
+
+        }
 
     return result
