@@ -2,15 +2,16 @@ import requests
 import os
 from flask_restful import Resource
 
+from util import flatten_list, count_items_in_list
 
 # authenticate for more pings
 AUTH = (os.getenv('GITHUB_USER'), os.getenv('GITHUB_PASSWORD'))
 
 
 class GithubAPI(Resource):
-    def get(self, user):
+    def get(self, gh_user):
         result = {
-            'data': get_github_stats(user)
+            'data': get_github_stats(gh_user)
         }
 
         return result
@@ -67,40 +68,6 @@ def get_github_pagination(link_str, endpoint):
         user, last_page = last_info.split('repositories/')[1].split('/{}?'.format(endpoint))[0], last_info.split('?page=')[1].split('>')[0]
 
     return user, last_page
-
-
-def flatten_list(nested_list):
-    """
-
-    :param nested_list:
-    :return:
-    """
-    flat_last = []
-    # flatten the list with all the data (each page's data = list of dicts)
-    for json_list in nested_list:
-        for json_obj in json_list:
-            flat_last.append(json_obj)
-
-    return flat_last
-
-
-def count_list_items(list_of_items):
-    """
-
-    :return:
-    """
-
-    # counter
-    counter = {}
-
-    # get unique counts thru info item list
-    for i in list_of_items:
-        if i not in counter:
-            counter[i] = 1
-        else:
-            counter[i] += 1
-
-    return counter
 
 
 def page_thru_github_data_count(path):
@@ -283,7 +250,7 @@ def get_repo_summary(repos, item, action, repo_type=None):
     elif action == 'count':
 
         # counter - get unique counts thru info item list
-        counter = count_list_items(info_item_list)
+        counter = count_items_in_list(info_item_list)
         total = counter
 
     else:
@@ -332,7 +299,7 @@ def get_github_stats(user):
     flat_repo_topics = flatten_list(repo_topics)
 
     # count/list of topics
-    list_count_repo_topics = count_list_items(flat_repo_topics)
+    list_count_repo_topics = count_items_in_list(flat_repo_topics)
 
     result = {
         # login

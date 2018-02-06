@@ -3,11 +3,13 @@ import os
 
 from flask_restful import Resource
 
+from util import flatten_list, count_items_in_list, get_specific_count_to_sum
+
 
 class BitbucketAPI(Resource):
-    def get(self, user):
+    def get(self, bb_user):
         result = {
-            'data': get_bitbucket_stats(user)
+            'data': get_bitbucket_stats(bb_user)
         }
 
         return result
@@ -38,63 +40,6 @@ def get_bitbucket_data(path):
         result = None
 
     return result
-
-
-def flatten_list(nested_list):
-    """
-
-    :param nested_list:
-    :return:
-    """
-    flat_last = []
-    # flatten the list with all the data (each page's data = list of dicts)
-    for json_list in nested_list:
-        for json_obj in json_list:
-            flat_last.append(json_obj)
-
-    return flat_last
-
-
-def count_in_list_of_json(list_of_json, item=None):
-    """
-
-    :return:
-    """
-
-    # counter
-    counter = {}
-
-    # check list_of_json
-    if list_of_json:
-        # get unique counts thru info item list
-        for json_obj in list_of_json:
-            if item:
-                if json_obj[item] not in counter:
-                    counter[json_obj[item]] = 1
-                else:
-                    counter[json_obj[item]] += 1
-            else:
-                if json_obj not in counter:
-                    counter[json_obj] = 1
-                else:
-                    counter[json_obj] += 1
-
-    return counter
-
-
-def get_specific_count_to_sum(list_of_json, key_of_interest):
-    """
-    From a counter (list of json that has been counted), extract a specific count and sum
-    :param list_of_json:
-    :param key_of_interest:
-    :return:
-    """
-    to_sum = []
-    for json_obj in list_of_json:
-        if key_of_interest in json_obj.keys():
-            to_sum.append(json_obj[key_of_interest])
-
-    return sum(to_sum)
 
 
 def page_thru_bitbucket_data_json(path):
@@ -192,7 +137,7 @@ def get_bitbucket_stats(user):
             all_issues = get_bitbucket_data(repo['links']['issues']['href'])['result']['values']
 
             # create list/count of issues
-            issues.append(count_in_list_of_json(all_issues, 'state'))
+            issues.append(count_items_in_list(all_issues, 'state'))
 
     result = {
 
@@ -205,28 +150,25 @@ def get_bitbucket_stats(user):
         # total following count
         "following": get_bitbucket_data(user_data_links['following']['href'])['result']['size'],
 
-        # total number of stars given
-        "total_stars_given": 0,  # NA
-
-        # total number of stars received
-        "total_stars_received": 0,  # NA
+        # # total number of stars given
+        # "total_stars_given": 0,  # NA
+        #
+        # # total number of stars received
+        # "total_stars_received": 0,  # NA
 
         # list/count of repo topics
 
         # list/count of languages used
-        "languages": count_in_list_of_json(language),
+        "languages": count_items_in_list(language),
 
         # total number of public repos (original vs forked)
-        "repos": count_in_list_of_json(repo_types),      # get_bitbucket_data(user_data_links['repositories']['href'])['result']['size'],  #TODO check orig vs forked
-
-        # total watcher count
-        "total_watchers": sum(watchers),
+        "repos": count_items_in_list(repo_types),
 
         # total number of open issues
         "total_open_issues": get_specific_count_to_sum(issues, 'new'),
 
         # total number of commits to their repos (not forks)
-        "total_commits": len(commits),  # TODO only repos not forks
+        "total_commits": len(commits),
 
         # total size of their account
         "total_account_size": sum(size)
