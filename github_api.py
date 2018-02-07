@@ -271,8 +271,12 @@ def get_github_stats(user):
     :return: summary stats json
     """
     # check user is valid
-    if get_github_data('users/{}/repos'.format(user))['result'].status_code != 200:
-        result = {"message": "Please check user is a valid Github user."}
+    user_data = get_github_data('users/{}/repos'.format(user))['result']
+
+    if user_data.status_code != 200:
+        result = {
+            "message": user_data.json()['message']
+        }
 
     else:
         # get repo data
