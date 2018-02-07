@@ -1,26 +1,28 @@
 def flatten_list(nested_list):
     """
-
-    :param nested_list:
-    :return:
+    Given a nested list flatten it
+    :param nested_list: nested list
+    :return: flattened list
     """
-    flat_last = []
+    flat_list = []
+
     # flatten the list with all the data (each page's data = list of dicts)
     for json_list in nested_list:
         for json_obj in json_list:
-            flat_last.append(json_obj)
+            flat_list.append(json_obj)
 
-    return flat_last
+    return flat_list
 
 
 def flatten_list_of_dicts(nested_list):
     """
     Flatten a list of dictionaries ex: [{k1:v1, k2:v2}, {k3:v3}]
-    :param nested_list:
+    :param nested_list: nested list
     :return: list of [{k1:v1}, {k2:v2} {k1:v1}]
     """
 
     agg_dict_list = []
+
     for dict_obj in nested_list:
         for key, value in dict_obj.items():
             agg_dict_list.append({key:value})
@@ -31,7 +33,7 @@ def flatten_list_of_dicts(nested_list):
 def aggregate_list_of_dicts(list_of_dicts):
     """
     Given a list of single dictionaries: [{k1:v1}, {k2:v2} {k1:v1}] get unique counts/aggregate
-    :param list_of_dicts:
+    :param list_of_dicts: list of dicts
     :return: unique count/aggregate of list
     """
 
@@ -49,8 +51,10 @@ def aggregate_list_of_dicts(list_of_dicts):
 
 def count_items_in_list(list_of_json, item=None):
     """
-
-    :return:
+    Given a list of json count the items in the list
+    :param list_of_json: list of json
+    :param item: give if looking for a particular item count in json
+    :return: dictionary of list of items and counts
     """
 
     # counter
@@ -58,7 +62,7 @@ def count_items_in_list(list_of_json, item=None):
 
     # check list_of_json
     if list_of_json:
-        # get unique counts thru list of json
+        # get unique counts through list of json
         for json_obj in list_of_json:
             if item:
                 if json_obj[item] not in counter:
@@ -76,13 +80,15 @@ def count_items_in_list(list_of_json, item=None):
 
 def get_specific_count_to_sum(list_of_json, key_of_interest):
     """
-    From a counter (list of json that has been counted), extract a specific count and sum
-    :param list_of_json:
-    :param key_of_interest:
-    :return:
+    From a counted list of json, extract a specific count and sum it up in the list
+    :param list_of_json: list of json - [{'new': 1, 'resolved':2, 'closed':3}, {'new':1}]
+    :param key_of_interest: key -  ex: 'new'
+    :return: count of key of interest - ex: 2
     """
     to_sum = []
+
     for json_obj in list_of_json:
+        # if key found in json obj grab the value and append to list for later summation
         if key_of_interest in json_obj.keys():
             to_sum.append(json_obj[key_of_interest])
 
