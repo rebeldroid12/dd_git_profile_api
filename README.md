@@ -21,7 +21,7 @@ Develop API that aggregates data from both Github and BitBucket API to present i
 1. *OPTIONAL* Add GITHUB_USER and GITHUB_PASSWORD to your environment variables with your github credentials (works if not OAuth2) this is only for rate limiting
 2. Clone repo: https://github.com/rebeldroid12/dd_git_profile_api/
 3. Create a virtualenv and run `pip install -r requirements.txt`
-4. Run `python my_api.py`
+4. Run `python app.py`
 5. You'll be running on ['http://127.0.0.1:5002']('http://127.0.0.1:5002')
 
 
