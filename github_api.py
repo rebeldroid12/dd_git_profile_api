@@ -2,10 +2,7 @@ import requests
 import os
 from flask_restful import Resource
 
-from util import flatten_list, count_items_in_list
-
-# authenticate for more pings - GITHUB_USER & GITHUB_PASSWORD needed in env vars
-AUTH = (os.getenv('GITHUB_USER'), os.getenv('GITHUB_PASSWORD'))
+from util import flatten_list, count_items_in_list, AUTH
 
 
 class GithubAPI(Resource):      # used to hit github stats endpoint

@@ -18,7 +18,7 @@ Develop API that aggregates data from both Github and BitBucket API to present i
 - list/count of repo topics
 
 ## How to run
-1. Add GITHUB_USER and GITHUB_PASSWORD to your environment variables with your github credentials (works if not two-auth)
+1. *OPTIONAL* Add GITHUB_USER and GITHUB_PASSWORD to your environment variables with your github credentials (works if not OAuth2) this is only for rate limiting
 2. Clone repo: https://github.com/rebeldroid12/dd_git_profile_api/
 3. Create a virtualenv and run `pip install -r requirements.txt`
 4. Run `python my_api.py`

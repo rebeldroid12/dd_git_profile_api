@@ -1,3 +1,12 @@
+import os
+
+# authenticate for more pings - GITHUB_USER & GITHUB_PASSWORD needed in env vars
+AUTH = (os.getenv('GITHUB_USER'), os.getenv('GITHUB_PASSWORD'))
+if AUTH == (None, None):
+    AUTH = None
+
+
+
 def flatten_list(nested_list):
     """
     Given a nested list flatten it
