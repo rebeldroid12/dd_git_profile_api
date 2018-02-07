@@ -6,7 +6,6 @@ if AUTH == (None, None):
     AUTH = None
 
 
-
 def flatten_list(nested_list):
     """
     Given a nested list flatten it

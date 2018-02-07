@@ -1,5 +1,6 @@
-import requests
 import os
+
+import requests
 from flask_restful import Resource
 
 from util import flatten_list, count_items_in_list, AUTH
@@ -295,6 +296,7 @@ def get_github_stats(user):
         # list of json data - topics
         repo_topics = []
         for repo_topic in get_list_of_topics:
+
             repo_topics.append(get_github_data(repo_topic)['result'].json()['names'])
 
         # list of json data - commits
