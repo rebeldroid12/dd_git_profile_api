@@ -1,72 +1,61 @@
+import unittest
 import bitbucket_api
 import github_api
 
 
-# test all things bitbucket
-def test_BitbucketAPI():
-    pass
+class TestMyAPI(unittest.TestCase):
+
+    # test all things bitbucket
+    def test_BitbucketAPI(self):
+        pass
+
+    def test_get_bitbucket_data(self):
+        pass
+
+    def test_page_thru_bitbucket_data_json(self):
+        pass
+
+    def test_get_bitbucket_stats(self):
+        pass
+
+    # test all things github
+    def test_GithubAPI(self):
+        pass
+
+    def test_get_github_data(self):
+        pass
+
+    def test_get_github_pagination(self):
+        pass
+
+    def test_page_thru_github_data_count(self):
+        pass
+
+    def test_page_thru_github_data_json(self):
+        pass
+
+    def test_get_repo_info(self):
+        pass
+
+    def test_cleaned_repos_data(self):
+        pass
+
+    def test_get_repo_summary(self):
+        pass
+
+    def test_get_github_stats(self):
+        pass
+
+    # test util functions
+    def test_flatten_list(self):
+        pass
+
+    def test_count_items_in_list(self):
+        pass
+
+    def test_get_specific_count_to_sum(self):
+        pass
 
 
-def test_get_bitbucket_data():
-    pass
-
-
-def test_page_thru_bitbucket_data_json():
-    pass
-
-
-def test_get_bitbucket_stats():
-    pass
-
-
-# test all things github
-def test_GithubAPI():
-    pass
-
-
-def test_get_github_data():
-    pass
-
-
-def test_get_github_pagination():
-    pass
-
-
-def test_page_thru_github_data_count():
-    pass
-
-
-def test_page_thru_github_data_json():
-    pass
-
-
-def test_get_repo_info():
-    pass
-
-
-def test_cleaned_repos_data():
-    pass
-
-
-def test_get_repo_summary():
-    pass
-
-
-def test_get_github_stats():
-    pass
-
-
-# test util functions
-def test_flatten_list():
-    pass
-
-
-def test_count_items_in_list():
-    pass
-
-
-def test_get_specific_count_to_sum():
-    pass
-
-
-
+if __name__ == '__main__':
+    unittest.main()
